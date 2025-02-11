@@ -1,24 +1,27 @@
+/* Import Font */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+/* Reset Default Styles */
 * {
-    padding: 0;
     margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
+/* Body Styling */
 body {
     font-family: 'Roboto', sans-serif;
-    background: #4e54c8;
-    background: -webkit-linear-gradient(to right, #8f94fb, #4e54c8);
     background: linear-gradient(to right, #8f94fb, #4e54c8);
 }
 
+/* Container */
 .container {
     width: 590px;
     height: 100vh;
     margin: 0 auto;
 }
 
+/* Header */
 .header {
     padding: 15px;
     color: #fff;
@@ -42,27 +45,33 @@ body {
 .header .description {
     font-size: 13px;
 }
+
+/* Logout Button */
 .logout {
     position: absolute;
     top: 20px;
     right: 80px;
 }
+
 .btn-logout {
     background-color: #ff4d4d;
     color: white;
     padding: 10px 15px;
-    text-decoration: none;
-
     font-weight: bold;
+    border: none;
+    cursor: pointer;
 }
+
 .btn-logout:hover {
     background-color: #cc0000;
 }
 
+/* Content */
 .content {
     padding: 15px;
 }
 
+/* Card */
 .card {
     background-color: #fff;
     padding: 15px;
@@ -70,54 +79,53 @@ body {
     margin-bottom: 15px;
 }
 
+/* Input Control */
 .input-control {
     width: 100%;
-    display: block;
     padding: 0.5rem;
     font-size: 1rem;
     margin-bottom: 10px;
 }
 
-.text-right {
-    text-align: right;
+/* Buttons Layout */
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+#add-subtask {
+    flex-grow: 1;
+}
+
+.text-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Button */
 button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
     cursor: pointer;
-    background: #4e54c8;
-    background: -webkit-linear-gradient(to right, #8f94fb, #4e54c8);
     background: linear-gradient(to right, #8f94fb, #4e54c8);
     color: #fff;
-    border: 1px solid;
+    border: none;
     border-radius: 3px;
-    margin-bottom: 25px;
 }
 
+/* Task Item */
 .task-item {
     display: flex;
     justify-content: space-between;
 }
 
-.text-orange {
-    color: orange;
-}
-
-.text-red {
-    color: red;
-}
-
 .task-item.done span {
-    text-decoration: line-through;
-    color: #ccc;
-}
-.done span {
     text-decoration: line-through;
     color: gray;
 }
 
-
+/* Responsive */
 @media (max-width: 768px) {
     .container {
         width: 100%;

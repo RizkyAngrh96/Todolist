@@ -123,7 +123,7 @@ if(isset($_GET['logout'])) {
                     <div id="subtask-container">
                         <input type="text" name="subtasks[]" class="input-control" placeholder="Tambahkan subtask...">
                     </div>
-                    <button type="button" id="add-subtask">Tambah Subtask</button>
+                    <button type="button" id="add-subtask">Tambah Sub Tugas</button>
                     <div class="text-right">
                         <button type="submit" name="add">Tambah</button>
                     </div>
@@ -143,13 +143,10 @@ if(isset($_GET['logout'])) {
                         <div>
                             <input type="checkbox" onclick="window.location.href = '?done=<?= $r['taskid'] ?>&status=<?= $r['taskstatus'] ?>'" <?= $r['taskstatus'] == 'close' ? 'checked disabled' : '' ?>>
                             <span><?= $r['tasklabel'] ?></span>
-                            <div class="task-meta">
-                                Dibuat: <?= date("d M Y", strtotime($r['createdat'])) ?> | Deadline: <?= date("d M Y", strtotime($r['deadline'])) ?>
-                            </div>
                         </div>
                         <div class="actions">
-                            <a href="edit.php?id=<?= $r['taskid'] ?>" class="edit"><i class="bx bx-edit"></i></a>
-                            <a href="?delete=<?= $r['taskid'] ?>" class="delete" onclick="return confirm('Hapus tugas ini?')"><i class="bx bx-trash"></i></a>
+                            <button onclick="window.location.href='edit.php?id=<?= $r['taskid'] ?>'" class="btn-edit">Edit Tugas</button>
+                            <button onclick="if(confirm('Hapus tugas ini?')) window.location.href='?delete=<?= $r['taskid'] ?>'" class="btn-delete">Hapus Tugas</button>
                         </div>
                     </div>
 
@@ -167,10 +164,15 @@ if(isset($_GET['logout'])) {
                             </div>
                         <?php endwhile; ?>
                     </div>
+                    <div class="task-meta">
+                        Dibuat: <?= date("d M Y", strtotime($r['createdat'])) ?> | Deadline: <?= date("d M Y", strtotime($r['deadline'])) ?>
+                    </div>
                 </div>
             <?php endwhile; ?>
         </div>
     </div>
+</body>
+</html>
 
     <!-- Pindahkan script ini ke bawah dan di luar loop -->
     <script>
