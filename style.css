@@ -12,45 +12,46 @@
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(to right, #8f94fb, #4e54c8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 /* Container */
 .container {
-    width: 590px;
-    height: 100vh;
-    margin: 0 auto;
+    width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Header */
 .header {
     padding: 15px;
-    color: #fff;
+    color: #333;
+    text-align: center;
 }
 
 .header .title {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-bottom: 7px;
-}
-
-.header .title i {
-    font-size: 24px;
-    margin-right: 10px;
-}
-
-.header .title span {
-    font-size: 18px;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .header .description {
-    font-size: 13px;
+    font-size: 14px;
+    color: #666;
 }
 
 /* Logout Button */
 .logout {
-    position: absolute;
-    top: 20px;
-    right: 80px;
+    text-align: right;
+    margin-bottom: 10px;
 }
 
 .btn-logout {
@@ -60,6 +61,7 @@ body {
     font-weight: bold;
     border: none;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .btn-logout:hover {
@@ -77,14 +79,17 @@ body {
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 15px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Input Control */
 .input-control {
     width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
+    padding: 8px;
+    font-size: 16px;
     margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 /* Buttons Layout */
@@ -96,6 +101,12 @@ body {
 
 #add-subtask {
     flex-grow: 1;
+    background: #4e54c8;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 .text-right {
@@ -105,29 +116,167 @@ body {
 
 /* Button */
 button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    padding: 8px 12px;
+    font-size: 14px;
     cursor: pointer;
     background: linear-gradient(to right, #8f94fb, #4e54c8);
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px;
+    transition: 0.3s;
 }
 
-/* Task Item */
-.task-item {
+button:hover {
+    background: #4e54c8;
+}
+
+/* Task Styling */
+.task {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    background: #ffd06c;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
 
-.task-item.done span {
+.task span {
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.task.completed {
+    background: #d4edda;
+}
+
+.task.completed span {
+    text-decoration: line-through;
+    color: #155724;
+}
+
+.task.late {
+    background: #f8d7da;
+}
+
+.task.late span {
+    color: #721c24;
+}
+
+.task button {
+    margin-left: 5px;
+}
+.task-date {
+    margin-bottom: 20px;
+}
+
+/* Subtasks */
+.subtasks {
+    margin-left: 20px;
+    margin-top: 5px;
+}
+
+.subtasks .subtask {
+    display: flex;
+    align-items: center;
+    background: #ffd06c;
+    padding: 5px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.subtasks .subtask span {
+    flex-grow: 1;
+    margin-left: 5px;
+}
+
+.subtasks .subtask.completed {
+    background: #c3e6cb;
+}
+
+.subtasks .subtask.completed span {
+    text-decoration: line-through;
+}
+.subtask-list {
+    margin-left: 20px;
+    padding-left: 15px;
+    border-left: 2px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.subtask {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subtask.completed {
     text-decoration: line-through;
     color: gray;
 }
+.btn-edit {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-left: 5px;
+    font-size: 14px;
+}
+.btn-edit:hover {
+    background-color: #0056b3;
+}
+.notification {
+    background-color: #ffcc00;
+    color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-start;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notification i {
+    font-size: 22px;
+    margin-right: 12px;
+    margin-top: 4px;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.notification span {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.notification ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.notification li {
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+
 
 /* Responsive */
 @media (max-width: 768px) {
     .container {
         width: 100%;
+        padding: 10px;
     }
 }

@@ -1,125 +1,122 @@
 <?php
-	include 'koneksi.php';
+session_start();
+include 'koneksi.php';
 
-	// select data yang akan diedit
-	$q_select = "SELECT * FROM tasks WHERE taskid = '".$_GET['id']."' ";
-	$run_q_select = mysqli_query($conn, $q_select);
-	$d = mysqli_fetch_object($run_q_select);
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>alert('Silakan login terlebih dahulu!'); window.location.href='login.php';</script>";
+    exit();
+}
 
-	// select subtasks
-	$q_subtasks = "SELECT * FROM subtasks WHERE taskid = '".$_GET['id']."'";
-	$run_q_subtasks = mysqli_query($conn, $q_subtasks);
+$user_id = $_SESSION['user_id'];
+$taskid = $_GET['taskid'] ?? '';
 
-	// cek apakah deadline sudah lewat
-	$today = date('Y-m-d');
-	$deadline_passed = strtotime($d->deadline) < time();
+if (!$taskid) {
+    echo "<script>alert('Tugas tidak ditemukan!'); window.location.href='index.php';</script>";
+    exit();
+}
 
-	// proses edit data
-	if(isset($_POST['edit'])){
-		$new_deadline = $_POST['deadline'];
-		if (!$deadline_passed && strtotime($new_deadline) >= strtotime($today)) {
-			$q_update = "UPDATE tasks SET tasklabel = '".$_POST['task']."', deadline = '".$new_deadline."' WHERE taskid = '".$_GET['id']."'";
-		} else {
-			$q_update = "UPDATE tasks SET tasklabel = '".$_POST['task']."' WHERE taskid = '".$_GET['id']."'";
-		}
-		$run_q_update = mysqli_query($conn, $q_update);
+// Ambil data tugas utama
+$q_task = "SELECT * FROM tasks WHERE taskid = '$taskid' AND user_id = '$user_id'";
+$task = mysqli_query($conn, $q_task);
+$task_data = mysqli_fetch_assoc($task);
 
-		// update subtasks
-		foreach ($_POST['subtasks'] as $subtask_id => $subtask_label) {
-			mysqli_query($conn, "UPDATE subtasks SET subtasklabel = '$subtask_label' WHERE subtaskid = '$subtask_id'");
-		}
+if (!$task_data) {
+    echo "<script>alert('Tugas tidak valid!'); window.location.href='index.php';</script>";
+    exit();
+}
 
-		header('Refresh:0; url=index.php');
-	}
+// Ambil data subtugas
+$q_subtasks = "SELECT * FROM subtasks WHERE taskid = '$taskid'";
+$subtasks = mysqli_query($conn, $q_subtasks);
+
+// Proses update tugas utama
+if (isset($_POST['update_task'])) {
+    $tasklabel = mysqli_real_escape_string($conn, $_POST['tasklabel']);
+    $deadline = $_POST['deadline'];
+    $today = date('Y-m-d');
+
+    if (empty($tasklabel)) {
+        echo "<script>alert('Nama tugas tidak boleh kosong!');</script>";
+    } elseif ($deadline <= $today) {
+        echo "<script>alert('Deadline hanya bisa diatur untuk besok atau lebih!');</script>";
+    } else {
+        $q_update_task = "UPDATE tasks SET tasklabel = '$tasklabel', deadline = '$deadline' WHERE taskid = '$taskid'";
+        mysqli_query($conn, $q_update_task);
+        echo "<script>alert('Tugas berhasil diperbarui!'); window.location.href='index.php';</script>";
+    }
+}
+
+// Proses update subtugas
+if (isset($_POST['update_subtask'])) {
+    $subtaskid = $_POST['subtaskid'];
+    $subtasklabel = mysqli_real_escape_string($conn, $_POST['subtasklabel']);
+
+    if (empty(trim($subtasklabel))) {
+        echo "<script>alert('Subtugas tidak boleh kosong!'); window.location.href='edit.php?taskid=$taskid';</script>";
+        exit();
+    }
+    
+    $q_update_subtask = "UPDATE subtasks SET subtasklabel = '$subtasklabel' WHERE subtaskid = '$subtaskid'";
+    if (mysqli_query($conn, $q_update_subtask)) {
+        echo "<script>alert('Subtugas berhasil diperbarui!'); window.location.href='edit.php?taskid=$taskid';</script>";
+    } else {
+        echo "<script>alert('Gagal memperbarui subtugas!');</script>";
+    }
+    
+}
+
+// Proses tambah subtugas
+if (isset($_POST['add_subtask'])) {
+    $new_subtasklabel = mysqli_real_escape_string($conn, $_POST['new_subtasklabel']);
+
+    if (empty($new_subtasklabel)) {
+        echo "<script>alert('Subtugas tidak boleh kosong!');</script>";
+    } else {
+        $q_add_subtask = "INSERT INTO subtasks (taskid, subtasklabel) VALUES ('$taskid', '$new_subtasklabel')";
+        mysqli_query($conn, $q_add_subtask);
+        echo "<script>alert('Subtugas berhasil ditambahkan!'); window.location.href='edit.php?taskid=$taskid';</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>To Do List</title>
-	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-	<style type="text/css">
-		@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-		* {
-			padding:0;
-			margin:0;
-			box-sizing: border-box;
-		}
-		body {
-			font-family: 'Roboto', sans-serif;
-			background: linear-gradient(to right, #8f94fb, #4e54c8);
-		}
-		.container {
-			width: 590px;
-			height: 100vh;
-			margin:0 auto;
-		}
-		.header {
-			padding: 15px;
-			color: #fff;
-		}
-		.content {
-			padding: 15px;
-		}
-		.card {
-			background-color: #fff;
-			padding:15px;
-			border-radius: 5px;
-			margin-bottom: 10px;
-		}
-		.input-control {
-			width:100%;
-			display: block;
-			padding:0.5rem;
-			font-size: 1rem;
-			margin-bottom: 10px;
-		}
-		.text-right {
-			text-align: right;
-		}
-		button {
-			padding:0.5rem 1rem;
-			font-size: 1rem;
-			cursor: pointer;
-			background: linear-gradient(to right, #8f94fb, #4e54c8);
-			color: #fff;
-			border:1px solid;
-			border-radius: 3px;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Tugas</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div class="container">
-		<div class="header">
-			<div class="title">
-				<a href="index.php"><i class='bx bx-chevron-left'></i></a>
-				<span>Back</span>
-			</div>
-			<div class="description">
-				<?= date("l, d M Y") ?>
-			</div>
-		</div>
-		<div class="content">
-			<div class="card">
-				<form action="" method="post">
-					<input type="text" name="task" class="input-control" placeholder="Edit task" value="<?= $d->tasklabel ?>" required>
-					<?php if (!$deadline_passed): ?>
-						<input type="date" name="deadline" class="input-control" value="<?= $d->deadline ?>" min="<?= $today ?>">
-					<?php else: ?>
-						<p><strong>Deadline:</strong> <?= $d->deadline ?> (Tidak bisa diedit)</p>
-					<?php endif; ?>
-					<h4>Edit Subtasks:</h4>
-					<?php while ($sub = mysqli_fetch_object($run_q_subtasks)): ?>
-						<input type="text" name="subtasks[<?= $sub->subtaskid ?>]" class="input-control" value="<?= $sub->subtasklabel ?>">
-					<?php endwhile; ?>
-					<div class="text-right">
-						<button type="submit" name="edit">Edit</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <h2>Edit Tugas</h2>
+        <form action="" method="post">
+            <label>Nama Tugas</label>
+            <input type="text" name="tasklabel" class="input-control" value="<?= $task_data['tasklabel'] ?>" required>
+
+            <label>Deadline</label>
+            <input type="date" name="deadline" class="input-control" value="<?= $task_data['deadline'] ?>" required min="<?= date('Y-m-d', strtotime('+1 day')) ?>">
+
+            <button type="submit" name="update_task">Simpan Perubahan</button>
+        </form>
+
+        <h3>Edit Subtugas</h3>
+        <?php while ($subtask = mysqli_fetch_array($subtasks)) : ?>
+            <form action="" method="post" style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <input type="hidden" name="subtaskid" value="<?= $subtask['subtaskid'] ?>">
+                <input type="text" name="subtasklabel" class="input-control" value="<?= $subtask['subtasklabel'] ?>" required>
+                <button type="submit" name="update_subtask">Simpan</button>
+            </form>
+        <?php endwhile; ?>
+
+        <h3>Tambah Subtugas</h3>
+        <form action="" method="post" style="display: flex; gap: 5px; margin-bottom: 10px;">
+            <input type="text" name="new_subtasklabel" class="input-control" placeholder="Masukkan subtugas baru" required>
+            <button type="submit" name="add_subtask">Tambah</button>
+        </form>
+
+        <br>
+        <button onclick="window.location.href='index.php';">Kembali</button>
+    </div>
 </body>
 </html>
